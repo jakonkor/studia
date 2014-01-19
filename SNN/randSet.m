@@ -1,4 +1,4 @@
-function y = randSet(x)
+function [y] = randSet(x)
     permutation = randperm(length(x));
     tmp = x;
     for i = 1:1:length(x)
