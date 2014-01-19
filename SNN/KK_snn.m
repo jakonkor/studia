@@ -3,9 +3,8 @@
 
 clc;
 clear;
-
 % Import danych z pliku tekstowego
-mDane=load('A_test_14.txt');
+mDane=load('snn_b.txt');
 %mDane = load('test_dane.txt');
 
 % Opis danych:
@@ -44,11 +43,14 @@ plot(mDane(:,1),mDane(:,2));
 print -djpg "dane_norm.jpg";
 %print -deps foo.eps
 
+
+logs = fopen('log.txt', "w+");
+
 %-----------------------------------------
 % pkt 2 - dobór liczby neuronów metodą porównania błędu śrenio-kwadratowego
 
-mHiddenNeuronMax = 30;
-mTestNumber = 30;
+mHiddenNeuronMax = 6;
+mTestNumber = 2;
 
 mErrorTrain = zeros(mHiddenNeuronMax, mTestNumber);
 mErrorTest = zeros(mHiddenNeuronMax, mTestNumber);
@@ -60,15 +62,11 @@ mErrorTestMin = zeros(mHiddenNeuronMax, 1);
 for neuronNum = 1:1:mHiddenNeuronMax
     for testNum = 1:1:mTestNumber
        
-        #randomizacja danych
-        permutation = randperm(length(mTrain));
-        mTrainRand = mTrain;
-        for i = 1:1:length(mTrain)
-            mTrainRand(i,:) = mTrain(permutation(i),:);
-        end
-        % czyszenie pamięci
-        mTrain = mTrainRand;	
-        clear mTrainRand;
+       
+
+        
+        mTrain = randSet(mTrain);
+        N = size(mTrain, 1);
         
         
         net = newff([min(mTrain(:,1)) max(mTrain(:,1))],[neuronNum 1],{"tansig" , "purelin"} , "trainlm", "learngdm", "mse");
@@ -84,6 +82,12 @@ for neuronNum = 1:1:mHiddenNeuronMax
         net.trainParam.epochs = 100; %maksymalna liczba epok 
         net=train(net,mTrain(:,1)',mTrain(:,2)'); %uczenie sieci
         
+        w = net.IW{1}';             
+        bin=net.b{1};               
+        v = net.LW{2,1}';           
+        bout = net.b{2}; 
+        paramsCount = numel(w)+numel(bin)+numel(v)+numel(bout)
+        
         %symulacja sieci
         y = sim(net,mTrain(:,1)');
         mErrorTrain(neuronNum, testNum) = (sum((y-mTrain(:,2)').^2)./2)./length(mTrain(:,1));
@@ -91,12 +95,53 @@ for neuronNum = 1:1:mHiddenNeuronMax
         y = sim(net,mTest(:,1)');
         mErrorTest(neuronNum, testNum) = (sum((y-mTest(:,2)').^2)./2)./length(mTest(:,1));
 
+        %dobór liczby neuronów metodą loo
+        fputs(logs, ['Neurony ukryte: ' num2str(neuronNum)]);
+        fputs(logs, ['Próba: ' num2str(testNum)]);
+        %disp(['JAKOBIAN: ']);
+        Z = calc_jacobian(net, mTrain);
+        mZrank=rank(Z);
+        fputs(logs, ['Rząd jacobaianu Z: ' num2str(mZrank) ]);
+        fputs(logs, ['Liczba parametrów sieci: ' num2str(paramsCount)]);
+        [U W V] = svd(Z);
+        W = diag(diag(W));
+        ZTZ = V*W*W*(V');
+        H = Z*(inv(ZTZ))*Z';
+        h = diag(H);
+        
+        rk = y - mTrain(:,2);
+        tmp = ones(size(h))
+        rk_k = rk./(tmp-h);
+        % hkk wariancja
+        mHkkVar = sum((mTrain(:,2)-y).^2)/size(y,1)
+        
+        q_N = paramsCount/N;
+        
+        w_hkk=sqrt(sum((q_N*ones(size(h))-h).^2)/N);
+        fputs(logs,  ['Wariancja hkk: ' num2str(w_hkk) ]);
+%disp(['Wariancja wartosci hkk=' num2str(w_hkk)]);
+        
+          w = net.IW{1}';              %weights inputs->hidden neurons
+    bin=net.b{1};               %input bias
+    v = net.LW{2,1}';           %weights hidden neurons->output
+    bout = net.b{2}; 
+        paramsCount = numel(w)+numel(bin)+numel(v)+numel(bout)
+        
+        
+
+
     end
     
     mErrorTrainAvr(neuronNum)=mean(mErrorTrain(neuronNum,:)');
     mErrorTestAvr(neuronNum)=mean(mErrorTest(neuronNum,:)');
     mErrorTrainMin(neuronNum)=min(mErrorTrain(neuronNum,:)');
     mErrorTestMin(neuronNum)=min(mErrorTest(neuronNum,:)');
+    
+    %csvwrite(logs, mErrorTrainAvr);
+    %csvwrite(logs, mErrorTestAvr);
+    %fprintf(logs, '%f ', mErrorTrainMin);
+    %fprintf(logs, '%f ', mErrorTestMin);
+    
     
 end
 
@@ -108,3 +153,8 @@ plot(x,mErrorTrainAvr','o-r',x,mErrorTestAvr','o-g');
 print -djpg "sredni_MSE.jpg";
 plot(x,mErrorTrainMin','o-r',x,mErrorTestMin','o-g');
 print -djpg "min_MSE.jpg";
+
+
+%dobór liczby neuronów metodą loo
+
+
