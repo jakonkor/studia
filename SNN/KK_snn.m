@@ -19,8 +19,8 @@ figure(1);
 plot(mDane(:,1),mDane(:,2), "ob", mDane_test(:,1),mDane_test(:,2), "*g");
 xlabel ("x");
 ylabel ("y");
-title ('Dane z plikow snn_b.txt i snn_test.txt');
-legend('snn_b.txt', 'snn_test.txt');
+title ('Dane z plikow snn b.txt i snn test.txt');
+legend('snn b.txt', 'snn test.txt');
 print -djpg "dane_all.jpg";
 
 % podzial zbioru na zbior uczacy i testowy
@@ -35,12 +35,20 @@ print -djpg "dane_norm.jpg";
 
 figure(3);
 plot(mTrain(:,1),mTrain(:,2), "ob",mTest(:,1),mTest(:,2), "*g" );
+xlabel ("x");
+ylabel ("y");
+title ('Zbior uczacy i testowy przed normowaniem');
+legend('zbior trenujacy', 'zbior testowy');
 print -djpg "dane_train_test.jpg";
 
 mTrain = normSet(mTrain);
 mTest = normSet(mTest);
 figure(4);
 plot(mTrain(:,1),mTrain(:,2), "ob",mTest(:,1),mTest(:,2), "*g" );
+xlabel ("x");
+ylabel ("y");
+title ('Zbior uczacy i testowy po normowaniu');
+legend('zbior trenujacy', 'zbior testowy');
 print -djpg "dane_train_test_norm.jpg";
 
 disp('Wizualizacja danych: zrobiona');
@@ -50,8 +58,8 @@ logs = fopen('logs.txt', "w+");
 % dobór liczby neuronów metodą porównania błędu śrenio-kwadratowego
 
 mse_logs = fopen('mse.txt', "w+");
-mHiddenNeuronMax = 1;
-mTestNumber = 1;
+mHiddenNeuronMax = 15;
+mTestNumber = 25;
 
 mErrorTrain = zeros(mHiddenNeuronMax, mTestNumber);
 mErrorTest = zeros(mHiddenNeuronMax, mTestNumber);
@@ -93,15 +101,23 @@ for neuronNum = 1:1:mHiddenNeuronMax
     mErrorTrainMin(neuronNum)=min(mErrorTrain(neuronNum,:)');
     mErrorTestMin(neuronNum)=min(mErrorTest(neuronNum,:)');
     
-    fputs(mse_logs,  [num2str(neuronNum) ; num2str(mErrorTrainAvr(neuronNum)) ; num2str(mErrorTestAvr(neuronNum)) ; num2str(mErrorTrainMin(neuronNum)) ; num2str(mErrorTestMin(neuronNum))  ]);
-    fputs(mse_logs, ["\n"]);
+    fprintf(mse_logs, '%i; %f; %f; %f; %f', neuronNum, mErrorTrainAvr(neuronNum), mErrorTestAvr(neuronNum), mErrorTrainMin(neuronNum), mErrorTestMin(neuronNum));
+    fprintf(mse_logs, '\n');
     
 end
-
+figure(5);
 x=linspace(1,mHiddenNeuronMax,mHiddenNeuronMax)
 plot(x,mErrorTrainAvr','o-r',x,mErrorTestAvr','o-g');
+xlabel ("liczba neuronow ukrytych");
+ylabel ("blad");
+title ("Blad sredni");
+legend('zbior trenujacy', 'zbior testowy');
 print -djpg "sredni_MSE.jpg";
 plot(x,mErrorTrainMin','o-r',x,mErrorTestMin','o-g');
+xlabel ("liczba neuronow ukrytych");
+ylabel ("blad");
+title ("Blad minimalny");
+legend('zbior trenujacy', 'zbior testowy');
 print -djpg "min_MSE.jpg";
 
 
@@ -127,7 +143,7 @@ for testNum = 1:1:mTestNumber
         Ep(index) = Ep_tmp;
         u(index) = u_tmp;
         %params = [net.IW{1}', net.b{1}, net.LW{2,1}' net.b{2}];
-        %fprintf(file,'%f ',params);
+        %fprintf(file,'%i; %f; ',params);
         fprintf(file,'\n');
         index = index + 1;
     end 
