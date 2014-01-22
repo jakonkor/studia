@@ -61,7 +61,7 @@ logs = fopen('logs.txt', "w+");
 
 mse_logs = fopen('mse.txt', "w+");
 loo_logs = fopen('loo.txt', "w+");
-mHiddenNeuronMax = 10;
+mHiddenNeuronMax = 15;
 mTestNumber = 15;
 
 mErrorTrain = zeros(mHiddenNeuronMax, mTestNumber);
