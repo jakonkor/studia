@@ -56,10 +56,12 @@ disp('Wizualizacja danych: zrobiona');
 logs = fopen('logs.txt', "w+");
 %-----------------------------------------
 % dobór liczby neuronów metodą porównania błędu śrenio-kwadratowego
+% oraz metoda wirtualnej skrajnej ocenykrzyzowej
 
 mse_logs = fopen('mse.txt', "w+");
-mHiddenNeuronMax = 15;
-mTestNumber = 25;
+loo_logs = fopen('loo.txt', "w+");
+mHiddenNeuronMax = 10;
+mTestNumber = 15;
 
 mErrorTrain = zeros(mHiddenNeuronMax, mTestNumber);
 mErrorTest = zeros(mHiddenNeuronMax, mTestNumber);
@@ -70,6 +72,7 @@ mErrorTestMin = zeros(mHiddenNeuronMax, 1);
 
 for neuronNum = 1:1:mHiddenNeuronMax
 
+    fprintf(loo_logs, '%i; ', neuronNum);
     for testNum = 1:1:mTestNumber
        
         mTrain = randSet(mTrain);
@@ -87,24 +90,22 @@ for neuronNum = 1:1:mHiddenNeuronMax
         rk = y - mTrain(:,2);
         rk_k = rk./(ones(size(h))-h);
         
-        % hkk wariancja
-        mHkkVar = sum((mTrain(:,2)-y).^2)/size(y,1)
-        
         w_hkk=sqrt(sum((q_N*ones(size(h))-h).^2)/N);
-        fputs(logs,  ['Wariancja hkk: ' num2str(w_hkk) ]);
-        %disp(['Wariancja wartosci hkk=' num2str(w_hkk)]);
-
+        fprintf(loo_logs, 'P %i: %i', testNum, rank_Z);
+        fprintf(loo_logs, 'P %i: %f', testNum, w_hkk);
+      
     end
     
     mErrorTrainAvr(neuronNum)=mean(mErrorTrain(neuronNum,:)');
     mErrorTestAvr(neuronNum)=mean(mErrorTest(neuronNum,:)');
     mErrorTrainMin(neuronNum)=min(mErrorTrain(neuronNum,:)');
     mErrorTestMin(neuronNum)=min(mErrorTest(neuronNum,:)');
-    
+     
     fprintf(mse_logs, '%i; %f; %f; %f; %f', neuronNum, mErrorTrainAvr(neuronNum), mErrorTestAvr(neuronNum), mErrorTrainMin(neuronNum), mErrorTestMin(neuronNum));
     fprintf(mse_logs, '\n');
-    
+    fprintf(loo_logs, '\n');
 end
+
 figure(5);
 x=linspace(1,mHiddenNeuronMax,mHiddenNeuronMax)
 plot(x,mErrorTrainAvr','o-r',x,mErrorTestAvr','o-g');
@@ -120,9 +121,13 @@ title ("Blad minimalny");
 legend('zbior trenujacy', 'zbior testowy');
 print -djpg "min_MSE.jpg";
 
+fclose(mse_logs);
+fclose(loo_logs);
+
 
 % symulacja 50 sieci z optymalna liczna neuronow
-file = fopen('parametry_sieci.txt','w');
+params_logs = fopen('params.txt', "w+");
+epu_logs = fopen('epu.txt', "w+");
 mHiddenNeuronOpt = 5;
 mTestNumber = 50;
 Ep=zeros(1,mTestNumber);
@@ -142,18 +147,23 @@ for testNum = 1:1:mTestNumber
         u_tmp = 1/N*sum(sqrt((N/q)*h));
         Ep(index) = Ep_tmp;
         u(index) = u_tmp;
-        %params = [net.IW{1}', net.b{1}, net.LW{2,1}' net.b{2}];
-        %fprintf(file,'%i; %f; ',params);
-        fprintf(file,'\n');
+        fprintf(epu_logs, '%i; %f; %f;', testNum, Ep_tmp, u_tmp);
+        fprintf(epu_logs, '\n');
+        
+        params = [net.b{1}' net.IW{1,1}' net.b{2} net.LW{2,1}];
+        fprintf(params_logs, '%f ;' , params);
+        fprintf(params_logs,'\n');
         index = index + 1;
     end 
 end
-fclose(file);
+
 Ep = Ep(1:index-1)
 u = u(1:index-1)
 plot(Ep,u,'.g');
 ylabel('u');
 xlabel('Ep');
 print -djpg "EpU.jpg";
+fclose(params_logs);
+fclose(epu_logs);
 
 disp('all done');
