@@ -19,8 +19,8 @@ figure(1);
 plot(mDane(:,1),mDane(:,2), "ob", mDane_test(:,1),mDane_test(:,2), "*g");
 xlabel ("x");
 ylabel ("y");
-title ("Dane z plików snn_b.txt i snn_test.txt");
-legend("snn_b.txt", "snn_test.txt");
+title ('Dane z plikow snn_b.txt i snn_test.txt');
+legend('snn_b.txt', 'snn_test.txt');
 print -djpg "dane_all.jpg";
 
 % podzial zbioru na zbior uczacy i testowy
@@ -44,11 +44,12 @@ plot(mTrain(:,1),mTrain(:,2), "ob",mTest(:,1),mTest(:,2), "*g" );
 print -djpg "dane_train_test_norm.jpg";
 
 disp('Wizualizacja danych: zrobiona');
-logs = fopen('log.txt', "w+");
 
+logs = fopen('logs.txt', "w+");
 %-----------------------------------------
 % dobór liczby neuronów metodą porównania błędu śrenio-kwadratowego
 
+mse_logs = fopen('mse.txt', "w+");
 mHiddenNeuronMax = 1;
 mTestNumber = 1;
 
@@ -91,6 +92,9 @@ for neuronNum = 1:1:mHiddenNeuronMax
     mErrorTestAvr(neuronNum)=mean(mErrorTest(neuronNum,:)');
     mErrorTrainMin(neuronNum)=min(mErrorTrain(neuronNum,:)');
     mErrorTestMin(neuronNum)=min(mErrorTest(neuronNum,:)');
+    
+    fputs(mse_logs,  [num2str(neuronNum) ; num2str(mErrorTrainAvr(neuronNum)) ; num2str(mErrorTestAvr(neuronNum)) ; num2str(mErrorTrainMin(neuronNum)) ; num2str(mErrorTestMin(neuronNum))  ]);
+    fputs(mse_logs, ["\n"]);
     
 end
 
