@@ -4,27 +4,45 @@
 clc;
 clear;
 
+disp('Start:');
 % Import danych z pliku tekstowego
 % Opis danych:
 % kolumna 1 - x
 % kolumna 2 - y=f(x)
 
-mDane=load('snn_b.txt');
+mDane = load('snn_b.txt');
+mDane_test = load('snn_test.txt');
 % mniejszy zbior do szybkiego testowania
 %mDane = load('test_dane.txt');
 
+figure(1);
 plot(mDane(:,1),mDane(:,2));
-print -djpg "dane_oryginal.jpg";
+plot(mDane_test(:,1),mDane_test(:,2));
+print -djpg "dane_oryginal_all.jpg";
 
-mDane = normSet(mDane);
 % podzial zbioru na zbior uczacy i testowy
 [mTrain, mTest] = subset(mDane',1,1,1/2);
 mTrain = mTrain';
 mTest = mTest';
 
+mDane = normSet(mDane);
+figure(2);
 plot(mDane(:,1),mDane(:,2));
 print -djpg "dane_norm.jpg";
 
+figure(3);
+plot(mTrain(:,1),mTrain(:,2));
+plot(mTest(:,1),mTest(:,2));
+print -djpg "dane_train_test.jpg";
+
+mTrain = normSet(mTrain);
+mTest = normSet(mTest);
+figure(4);
+plot(mTrain(:,1),mTrain(:,2));
+plot(mTest(:,1),mTest(:,2));
+print -djpg "dane_train_test_norm.jpg";
+
+disp('Wizualizacja danych: zrobiona');
 logs = fopen('log.txt', "w+");
 
 %-----------------------------------------
@@ -103,8 +121,8 @@ for testNum = 1:1:mTestNumber
         u_tmp = 1/N*sum(sqrt((N/q)*h));
         Ep(index) = Ep_tmp;
         u(index) = u_tmp;
-        params = [net.IW{1}' net.b{1} net.LW{2,1}' net.b{2}];
-        fprintf(file,'%f ',params);
+        %params = [net.IW{1}', net.b{1}, net.LW{2,1}' net.b{2}];
+        %fprintf(file,'%f ',params);
         fprintf(file,'\n');
         index = index + 1;
     end 
@@ -116,3 +134,5 @@ plot(Ep,u,'.g');
 ylabel('u');
 xlabel('Ep');
 print -djpg "EpU.jpg";
+
+disp('all done');

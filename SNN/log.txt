@@ -1,1 +1,1 @@
-Wariancja hkk: 0.11251
+Wariancja hkk: 0.025426
