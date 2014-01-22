@@ -16,9 +16,12 @@ mDane_test = load('snn_test.txt');
 %mDane = load('test_dane.txt');
 
 figure(1);
-plot(mDane(:,1),mDane(:,2));
-plot(mDane_test(:,1),mDane_test(:,2));
-print -djpg "dane_oryginal_all.jpg";
+plot(mDane(:,1),mDane(:,2), "ob", mDane_test(:,1),mDane_test(:,2), "*g");
+xlabel ("x");
+ylabel ("y");
+title ("Dane z plików snn_b.txt i snn_test.txt");
+legend("snn_b.txt", "snn_test.txt");
+print -djpg "dane_all.jpg";
 
 % podzial zbioru na zbior uczacy i testowy
 [mTrain, mTest] = subset(mDane',1,1,1/2);
@@ -31,15 +34,13 @@ plot(mDane(:,1),mDane(:,2));
 print -djpg "dane_norm.jpg";
 
 figure(3);
-plot(mTrain(:,1),mTrain(:,2));
-plot(mTest(:,1),mTest(:,2));
+plot(mTrain(:,1),mTrain(:,2), "ob",mTest(:,1),mTest(:,2), "*g" );
 print -djpg "dane_train_test.jpg";
 
 mTrain = normSet(mTrain);
 mTest = normSet(mTest);
 figure(4);
-plot(mTrain(:,1),mTrain(:,2));
-plot(mTest(:,1),mTest(:,2));
+plot(mTrain(:,1),mTrain(:,2), "ob",mTest(:,1),mTest(:,2), "*g" );
 print -djpg "dane_train_test_norm.jpg";
 
 disp('Wizualizacja danych: zrobiona');
