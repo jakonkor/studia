@@ -58,8 +58,16 @@ E_min = y-d_E;
 
 figure(2);
 hold on;
-%tmp1 = [dane_we, E_max, E_min];
-%tmp1 = sortrows(tmp1,1);
+plot(mDane_test(:,1), mDane_test(:,2), '.g');
+plot(mDane_test(:,1), y, 'b');
+xlabel ("x");
+ylabel ("y");
+title ('Predykcja danych testowych');
+legend('zbior testowy', 'wyjscie sieci');
+print -djpg "wykres_funkcji.jpg";
+
+figure(3);
+hold on;
 plot(mDane_test(:,1), mDane_test(:,2), '.g');
 plot(mDane_test(:,1), y, 'b');
 plot(mDane_test(:,1),E_max, 'r');
@@ -68,6 +76,4 @@ xlabel ("x");
 ylabel ("y");
 title ('Predykcja danych testowych z zaznaczeniem graniczych bledow');
 legend('zbior testowy', 'wyjscie sieci', 'blad maxymalny', 'blad minimalny');
-print -djpg "wykres_funkcji.jpg";
-
-
+print -djpg "wykres_funkcji_errors.jpg";
