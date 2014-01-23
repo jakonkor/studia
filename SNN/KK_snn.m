@@ -23,13 +23,13 @@ title ('Dane z plikow snn b.txt i snn test.txt');
 legend('snn b.txt', 'snn test.txt');
 print -djpg "dane_all.jpg";
 
-mDane = normSet(mDane);
+
 % podzial zbioru na zbior uczacy i testowy
 [mTrain, mTest] = subset(mDane',1,1,1/2);
 mTrain = mTrain';
 mTest = mTest';
 
-
+mDane = normSet(mDane);
 figure(2);
 plot(mDane(:,1),mDane(:,2));
 print -djpg "dane_norm.jpg";
@@ -42,8 +42,8 @@ title ('Zbior uczacy i testowy przed normowaniem');
 legend('zbior trenujacy', 'zbior testowy');
 print -djpg "dane_train_test.jpg";
 
-%mTrain = normSet(mTrain);
-%mTest = normSet(mTest);
+mTrain = normSet(mTrain);
+mTest = normSet(mTest);
 figure(4);
 plot(mTrain(:,1),mTrain(:,2), "ob",mTest(:,1),mTest(:,2), "*g" );
 xlabel ("x");
