@@ -16,6 +16,7 @@ mDane = load('snn_b.txt');
 mDane_test = load('snn_test.txt');
 
 mDane = normSet(mDane);
+mDane_test = normSet(mDane_test);
 % podzial zbioru na zbior uczacy i testowy
 [mTrain, mTest] = subset(mDane',1,1,1/2);
 mTrain = mTrain';
@@ -61,8 +62,8 @@ hold on;
 %tmp1 = sortrows(tmp1,1);
 plot(mDane_test(:,1), mDane_test(:,2), '.g');
 plot(mDane_test(:,1), y, 'b');
-plot(mDane_test(:,1),E_max, 'r');
-plot(mDane_test(:,1),E_min, 'r');
+%plot(mDane_test(:,1),E_max, 'r');
+%plot(mDane_test(:,1),E_min, 'r');
 xlabel ("x");
 ylabel ("y");
 title ('Predykcja danych testowych z zaznaczeniem graniczych bledow');
