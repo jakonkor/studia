@@ -80,6 +80,7 @@ legend('zbior testowy', 'wyjscie sieci', 'blad maxymalny', 'blad minimalny');
 print -djpg "wykres_funkcji_errors.jpg";
 
 % regresja wielomianowa 
+poly_logs = fopen('poly.txt', "w+");
 L = 25;
 error_poly = zeros(1,L);
 tmp = linspace(1,L,L);
@@ -87,7 +88,10 @@ for i=1:1:L
     p = polyfit(mDane_test(:,1)',mDane_test(:,2)',i);
     yn = polyval(p,mDane_test(:,1)');
     error_poly(i) = (sum((yn-mDane_test(:,2)').^2)./2)./N;
+    fprintf(poly_logs, '%i; %f;', i, error_poly(i));
+    fprintf(poly_logs, '\n');
 end
+fclose(poly_logs);
 
 figure(4)
 plot(mDane_test(:,1)',mDane_test(:,2)','rx',mDane_test(:,1)',yn,'-b');
