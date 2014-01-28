@@ -48,6 +48,7 @@ print -djpg "histogram_hkk.jpg";
 
 y = sim(net,mDane_test(:,1)');
 error = (sum((y-mDane_test(:,2)').^2)./2)./N;
+error
 
 t_stud = 1.96;  % alfa=0.05, N=inf
 
@@ -77,3 +78,37 @@ ylabel ("y");
 title ('Predykcja danych testowych z zaznaczeniem graniczych bledow');
 legend('zbior testowy', 'wyjscie sieci', 'blad maxymalny', 'blad minimalny');
 print -djpg "wykres_funkcji_errors.jpg";
+
+% regresja wielomianowa 
+L = 25;
+error_poly = zeros(1,L);
+tmp = linspace(1,L,L);
+for i=1:1:L
+    p = polyfit(mDane_test(:,1)',mDane_test(:,2)',i);
+    yn = polyval(p,mDane_test(:,1)');
+    error_poly(i) = (sum((yn-mDane_test(:,2)').^2)./2)./N;
+end
+
+figure(4)
+plot(mDane_test(:,1)',mDane_test(:,2)','rx',mDane_test(:,1)',yn,'-b');
+xlabel ("x");
+ylabel ("y");
+title ('Regresja wielomianowa');
+legend('zbior testowy', 'wynik polyval');
+print -djpg "regresja_wielomianowa.jpg";
+
+figure(5)
+plot(mDane_test(:,1)',mDane_test(:,2)','rx',mDane_test(:,1)',y,'-b');
+xlabel ("x");
+ylabel ("y");
+title ('Dzialanie sieci neuronowej na tle zbioru testowego');
+legend('zbior testowy', 'wyjscie sieci');
+print -djpg "test_vs_snn.jpg";
+
+figure(6)
+plot(tmp,error_poly,'x-r');
+xlabel ("stopien wielomianu");
+ylabel ("blad");
+title ('Blad regresji w zaleznosci od stopnia wielomianu');
+print -djpg "regresja_blad.jpg";
+error_poly
