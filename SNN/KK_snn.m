@@ -71,6 +71,8 @@ mErrorTestAvr = zeros(mHiddenNeuronMax, 1);
 mErrorTrainMin = zeros(mHiddenNeuronMax, 1);
 mErrorTestMin = zeros(mHiddenNeuronMax, 1);
 
+var_hkk = zeros(mHiddenNeuronMax, mTestNumber);
+
 for neuronNum = 1:1:mHiddenNeuronMax
 
     fprintf(loo_logs, '%i; ', neuronNum);
@@ -91,9 +93,10 @@ for neuronNum = 1:1:mHiddenNeuronMax
         rk = y - mTrain(:,2);
         rk_k = rk./(ones(size(h))-h);
         
-        w_hkk=sqrt(sum((q_N*ones(size(h))-h).^2)/N);
-        fprintf(loo_logs, 'P %i: %i', testNum, rank_Z);
-        fprintf(loo_logs, 'P %i: %f', testNum, w_hkk);
+        w_hkk = sqrt(sum((q_N*ones(size(h))-h).^2)/N);
+        var_hkk(neuronNum, testNum) = w_hkk;
+        fprintf(loo_logs, 'P; %i; rank; %i;', testNum, rank_Z);
+        fprintf(loo_logs, 'P; %i; hkk; %f;', testNum, w_hkk);
       
     end
     
@@ -104,6 +107,7 @@ for neuronNum = 1:1:mHiddenNeuronMax
      
     fprintf(mse_logs, '%i; %f; %f; %f; %f', neuronNum, mErrorTrainAvr(neuronNum), mErrorTestAvr(neuronNum), mErrorTrainMin(neuronNum), mErrorTestMin(neuronNum));
     fprintf(mse_logs, '\n');
+    fprintf(loo_logs, 'mean; %f;', mean(var_hkk(neuronNum,:)'));
     fprintf(loo_logs, '\n');
 end
 
